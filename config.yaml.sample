@@ -1,1 +1,2 @@
-server_address: "x.x.x.x:5984"
+http_server_address: "x.x.x.x:8081"
+mesh_server_address: "x.x.x.x:5984"

@@ -16,7 +16,8 @@ import (
 )
 
 type Config struct {
-	ServerAddress string `yaml:"server_address"`
+	HttpServerAddress string `yaml:"http_server_address"`
+	MeshServerAddress string `yaml:"mesh_server_address"`
 }
 
 func ReadConfigFile(path string) Config {
@@ -165,7 +166,7 @@ func main() {
 	conf := ReadConfigFile("config.yaml")
 	log.Println(conf)
 
-	conn, err := grpc.Dial(conf.ServerAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(conf.MeshServerAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
 	}
@@ -173,11 +174,11 @@ func main() {
 	chatHandler := &chatHandler{
 		grpcClient: grpcClient,
 	}
-	err = fasthttp.ListenAndServe(":8081", func(ctx *fasthttp.RequestCtx) {
+	err = fasthttp.ListenAndServe(conf.HttpServerAddress, func(ctx *fasthttp.RequestCtx) {
 		log.Printf("http server works: %s\n", string(ctx.Path()))
 
 		switch string(ctx.Path()) {
-		case "/api/chat/completions":
+		case "/v1/chat/completions":
 			chatHandler.Handle(ctx)
 		default:
 			ctx.Error("Unsupported path", fasthttp.StatusNotFound)

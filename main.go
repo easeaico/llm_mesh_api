@@ -60,8 +60,6 @@ type chatHandler struct {
 }
 
 func (h *chatHandler) Handle(ctx *fasthttp.RequestCtx) {
-	log.Println(ctx)
-
 	if ctx.IsOptions() {
 		ctx.SetContentType("application/json")
 		ctx.SetStatusCode(fasthttp.StatusOK)
@@ -74,19 +72,19 @@ func (h *chatHandler) Handle(ctx *fasthttp.RequestCtx) {
 	}
 
 	if !ctx.IsPost() {
+		log.Println("allow methos POST, OPTIONS error")
 		ctx.Error("allow methos POST, OPTIONS", fasthttp.StatusMethodNotAllowed)
 		return
 	}
 
-	log.Println("post requested")
 	chatReq := new(ChatCompletionRequest)
 	body := ctx.Request.Body()
 	err := json.Unmarshal(body, chatReq)
 	if err != nil {
+		log.Printf("illegal request body error: %v", err)
 		ctx.Error("illegal request body", fasthttp.StatusBadRequest)
 		return
 	}
-	log.Println(chatReq)
 
 	var msgs []*llm_mesh.ChatCompletionMessage
 	for _, m := range chatReq.Messages {

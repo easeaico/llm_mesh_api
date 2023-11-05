@@ -1,0 +1,13 @@
+[Unit]
+Description=A llm mesh api server in Go.
+After=network.target
+
+[Service]
+Type=exec
+User=harry
+ExecStart=/home/harry/Projects/llm_mesh_api/start.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
